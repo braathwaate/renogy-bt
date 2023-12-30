@@ -62,7 +62,9 @@ class BaseClient:
         operation = bytes_to_int(response, 1, 1)
 
         if operation == 3: # read operation
-            logging.info("on_data_received: response for read operation")
+            logging.info("on_data_received: response for read operation {}".format(len(response)))
+            # for x in range(0, len(response)):
+            #    logging.info("{}".format(bytes_to_int(response,x,1)))
             if (self.section_index < len(self.sections) and
                 self.sections[self.section_index]['parser'] != None and
                 self.sections[self.section_index]['words'] * 2 + 5 == len(response)):

@@ -83,6 +83,7 @@ class Device(gatt.Device):
 
     def characteristic_value_updated(self, characteristic, value):
         super().characteristic_value_updated(characteristic, value)
+        logging.info('characteristic_value_updated {}'.format(len(value)))
         self.data_callback(value)
 
     def characteristic_write_value(self, value):
