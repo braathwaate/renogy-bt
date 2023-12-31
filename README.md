@@ -121,6 +121,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Battery RBT50LFP48S | BT-2 | ❓ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
+| Renogy Lycan 5000 | BT-2 | ✅ |
 
 ### Disclaimer
 

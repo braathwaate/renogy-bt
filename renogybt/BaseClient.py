@@ -80,7 +80,10 @@ class BaseClient:
                 time.sleep(0.5)
                 self.read_section()
         else:
-            logging.warn("on_data_received: unknown operation={}".format(operation))
+            logging.warn("on_data_received: unknown address={} operation={}".format(self.sections[self.section_index]['register'],operation))
+            # self.sections[self.section_index]['register'] += 16
+            # time.sleep(0.5)
+            # self.read_section()
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
