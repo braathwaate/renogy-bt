@@ -145,34 +145,32 @@ class LycanClient(BaseClient):
         data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
         self.data.update(data)
 
+
     def parse_inverter_stats(self, bs):
         logging.info(f"parse_inverter_stats {bs.hex()}")
-        temp_unit = self.config['data']['temperature_unit']
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['uei_voltage'] = bytes_to_int(bs, 3, 2, scale = .1)
-        data['uei_current'] = bytes_to_int(bs, 5, 2)
-        data['voltage'] = bytes_to_int(bs, 7, 2, scale = .1)
+        data['uei_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
+        data['uei_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
+        data['voltage'] = bytes_to_int(bs, 7, 2, scale=0.1)
         data['load_current'] = bytes_to_int(bs, 9, 2)
-        data['frequency'] = bytes_to_int(bs, 11, 2, scale = .01)
-        # data['temperature'] = bytes_to_int(bs, 13, 2)
-        data['battery_temperature'] = parse_temperature(bytes_to_int(bs, 14, 1), temp_unit)
-        data['controller_temperature'] = parse_temperature(bytes_to_int(bs, 13, 1), temp_unit)
+        data['frequency'] = bytes_to_int(bs, 11, 2, scale=0.01)
+        data['temperature'] = bytes_to_int(bs, 13, 2, scale=0.1)
         self.data.update(data)
 
     def parse_inverter_model(self, bs):
         logging.info(f"parse_inverter_model {bs.hex()}")
         data = {}
-        data['model'] = (bs[3:17]).decode('utf-8')
+        data['model'] = (bs[3:15]).decode('utf-8')
         self.data.update(data)
 
     def parse_solar_charging(self, bs):
         logging.info(f"parse_solar_charging {bs.hex()}")
         data = {}
-        data['solar_voltage'] = bytes_to_int(bs, 3, 2)
-        data['solar_current'] = bytes_to_int(bs, 5, 2)
+        data['solar_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
+        data['solar_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
         data['solar_power'] = bytes_to_int(bs, 7, 2)
-        data['solar_charging_state'] = bytes_to_int(bs, 9, 2)
+        data['solar_charging_state'] = CHARGING_STATE.get(bytes_to_int(bs, 9, 2))
         data['solar_charging_power'] = bytes_to_int(bs, 11, 2)
         self.data.update(data)
 
@@ -180,7 +178,13 @@ class LycanClient(BaseClient):
         logging.info(f"parse_inverter_load {bs.hex()}")
         data = {}
         data['load_power'] = bytes_to_int(bs, 3, 2)
-        data['charging_current'] = bytes_to_int(bs, 5, 2)
+        data['charging_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
+        self.data.update(data)
+
+    def parse_battery_type(self, bs):
+        data = {}
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
         self.data.update(data)
 
     def parse_set_load_response(self, bs):
