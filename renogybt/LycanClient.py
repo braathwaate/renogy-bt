@@ -1,4 +1,5 @@
 import logging
+
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, parse_temperature
 
@@ -44,7 +45,6 @@ class LycanClient(BaseClient):
             {'register': 4329, 'words': 5, 'parser': self.parse_solar_charging},
             {'register': 4410, 'words': 2, 'parser': self.parse_inverter_load},
             # {'register': 0x20c, 'words': 22, 'parser': self.parse_more_info},
-            # {'register': 12, 'words': 8, 'parser': self.parse_device_info}
             # {'register': 0x107, 'words': 1, 'parser': self.parse_voltage_info},
             # {'register': 26, 'words': 1, 'parser': self.parse_device_address}
             {'register': 0x100, 'words': 16, 'parser': self.parse_chargin_info},
@@ -72,12 +72,6 @@ class LycanClient(BaseClient):
         request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
         self.device.characteristic_write_value(request)
 
-    def parse_device_info(self, bs):
-        data = {}
-        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['model'] = (bs[3:17]).decode('utf-8').strip()
-        self.data.update(data)
-
     def parse_voltage_info(self, bs):
         logging.info("parse_voltage_info")
         data = {}
@@ -96,7 +90,9 @@ class LycanClient(BaseClient):
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['battery_percentage'] = bytes_to_int(bs, 3, 2)
         data['battery_voltage'] = bytes_to_int(bs, 5, 2, scale = 0.1)
-        data['battery_current'] = bytes_to_int(bs, 7, 2, scale = 0.01)
+        raw_value = bytes_to_int(bs, 7, 2)
+        raw_value = (raw_value - 65536) if raw_value > 32768 else raw_value
+        data['battery_current'] = raw_value * 0.01
         # data['battery_temperature'] = parse_temperature(bytes_to_int(bs, 10, 1), temp_unit)
         # data['controller_temperature'] = parse_temperature(bytes_to_int(bs, 9, 1), temp_unit)
         # data['load_status'] = LOAD_STATE.get(bytes_to_int(bs, 67, 1) >> 7)

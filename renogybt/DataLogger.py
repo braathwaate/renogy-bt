@@ -12,6 +12,8 @@ class DataLogger:
         self.config = config
 
     def log_remote(self, json_data):
+        json_data['date'] = datetime.now().strftime("%Y%m%d")
+        json_data['time'] = datetime.now().strftime("%H:%M")
         headers = { "Authorization" : f"Bearer {self.config['remote_logging']['auth_header']}" }
         req = requests.post(self.config['remote_logging']['url'], json = json_data, timeout=15, headers=headers)
         logging.info("Log remote 200") if req.status_code == 200 else logging.error(f"Log remote error {req.status_code}")
